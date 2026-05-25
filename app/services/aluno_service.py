@@ -12,6 +12,8 @@ class AlunoService:
             session.rollback()
             if "unique" in str(exc).lower():
                 raise HTTPException(status_code=409, detail="Aluno com esse email ou matrícula já existe")
+            if "foreign key constraint" in str(exc).lower():
+                raise HTTPException(status_code=409, detail="Curso associado não encontrado")
             raise
     
     @staticmethod
@@ -22,6 +24,8 @@ class AlunoService:
             session.rollback()
             if "unique" in str(exc).lower():
                 raise HTTPException(status_code=409, detail="Aluno com esse email ou matrícula já existe")
+            if "foreign key constraint" in str(exc).lower():
+                raise HTTPException(status_code=409, detail="Curso associado não encontrado")
             raise
         if not aluno:
             raise HTTPException(status_code=404, detail="Aluno não encontrado")

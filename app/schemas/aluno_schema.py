@@ -1,5 +1,4 @@
 from sqlmodel import SQLModel, Field
-
 from app.models.curso_model import Curso
 
 class AlunoCreate(SQLModel):

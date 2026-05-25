@@ -2,6 +2,7 @@ from app.crud.curso_crud import CursoCRUD
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
+
 class CursoService:
     
     @staticmethod
