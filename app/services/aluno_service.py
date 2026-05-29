@@ -2,6 +2,8 @@ from app.crud.aluno_crud import AlunoCRUD
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
+from app.models.turma_model import Turma
+
 class AlunoService:
     
     @staticmethod
@@ -59,3 +61,27 @@ class AlunoService:
         if not aluno:
             raise HTTPException(status_code=404, detail="Aluno não encontrado")
         return aluno
+    
+    @staticmethod
+    def inclui_aluno_na_turma(session, aluno_id, turma_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = session.get(Turma, turma_id)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if turma in aluno.turmasMatriculadas:
+            raise HTTPException(status_code=400, detail="Aluno já matriculado nessa turma")
+        return AlunoCRUD.inclui_turma(session, aluno, turma)
+    
+    @staticmethod
+    def remove_aluno_da_turma(session, aluno_id, turma_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = session.get(Turma, turma_id)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if turma not in aluno.turmasMatriculadas:
+            raise HTTPException(status_code=400, detail="Aluno não matriculado nessa turma")
+        return AlunoCRUD.remove_turma(session, aluno, turma)

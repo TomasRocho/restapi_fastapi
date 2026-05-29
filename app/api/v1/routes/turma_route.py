@@ -1,6 +1,6 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends
-from app.schemas.turma_schema import TurmaCreate, TurmaRead, TurmaUpdate
+from app.schemas.turma_schema import TurmaCreate, TurmaRead, TurmaUpdate, TurmaCompleta
 from app.services.turma_service import TurmaService
 from app.api.dep import SessionDependency
 from app.core.security import get_current_username
@@ -30,4 +30,16 @@ def get_all_turmas(session: SessionDependency):
 @router.get("/{turma_id}", response_model=TurmaRead, summary="Obter uma turma por ID")
 def get_turma_by_id(turma_id: int, session: SessionDependency):
     return TurmaService.get_by_id(session, turma_id)
+
+@router.post("/{aluno_id}/matricular/{turma_id}", response_model=TurmaCompleta, summary="Matricular um aluno em uma turma")
+def matricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
+    return TurmaService.inclui_turma_no_aluno(session, aluno_id, turma_id)
+
+@router.delete("/{aluno_id}/desmatricular/{turma_id}", response_model=TurmaCompleta, summary="Desmatricular um aluno de uma turma")
+def desmatricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
+    return TurmaService.remove_turma_do_aluno(session, aluno_id, turma_id)
+
+@router.post("/{aluno_id}/monitorar/{turma_id}", response_model=TurmaCompleta, summary="Tornar um aluno monitor de uma turma")
+def monitorar_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
+    return TurmaService.inclui_monitor_no_aluno(session, aluno_id, turma_id)
 

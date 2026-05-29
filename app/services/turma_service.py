@@ -1,6 +1,9 @@
+from app.crud.aluno_crud import AlunoCRUD
 from app.crud.turma_crud import TurmaCRUD
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
+
+from app.models.turma_model import Turma
 
 class TurmaService:
     
@@ -52,3 +55,39 @@ class TurmaService:
     @staticmethod
     def get_by_parametros(session, descricao=None, periodo=None,nome_professor=None, nome_disciplina=None):
         return TurmaCRUD.get_by_parametros(session, descricao, periodo,nome_professor,nome_disciplina)
+    
+    @staticmethod
+    def inclui_turma_no_aluno(session, aluno_id, turma_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = session.get(Turma, turma_id)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if aluno in turma.alunosMatriculados:
+            raise HTTPException(status_code=400, detail="Aluno já matriculado nessa turma")
+        return TurmaCRUD.inclui_aluno(session, aluno, turma)
+    
+    @staticmethod
+    def remove_turma_do_aluno(session, aluno_id, turma_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = session.get(Turma, turma_id)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if aluno not in turma.alunosMatriculados:
+            raise HTTPException(status_code=400, detail="Aluno não matriculado nessa turma")
+        return TurmaCRUD.remove_aluno(session, aluno, turma)
+    
+    @staticmethod
+    def inclui_monitor_no_aluno(session, aluno_id, turma_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = session.get(Turma, turma_id)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if aluno in turma.alunosMonitores:
+            raise HTTPException(status_code=400, detail="Aluno já monitor dessa turma")
+        return TurmaCRUD.inclui_monitor(session, aluno, turma)

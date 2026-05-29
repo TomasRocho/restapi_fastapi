@@ -1,6 +1,6 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends
-from app.schemas.aluno_schema import AlunoCreate, AlunoRead, AlunoUpdate
+from app.schemas.aluno_schema import AlunoCreate, AlunoRead, AlunoUpdate, AlunoCompleto
 from app.services.aluno_service import AlunoService
 from app.api.dep import SessionDependency
 from app.core.security import get_current_username
@@ -19,7 +19,7 @@ def update_aluno(aluno_id: int, aluno_update: AlunoUpdate, session: SessionDepen
 def delete_aluno(aluno_id: int, session: SessionDependency):
     return AlunoService.delete(session, aluno_id)
 
-@router.get("/busca", response_model=list[AlunoRead],summary="Obter alunos por parâmetros de busca")
+@router.get("/busca", response_model=list[AlunoCompleto],summary="Obter alunos por parâmetros de busca")
 def get_alunos_by_parametros(session: SessionDependency, nome: Optional[str] = None, email: Optional[str] = None, matricula: Optional[str] = None):
     return AlunoService.get_by_parametros(session, nome, email, matricula)
 
@@ -27,6 +27,15 @@ def get_alunos_by_parametros(session: SessionDependency, nome: Optional[str] = N
 def get_all_alunos(session: SessionDependency):
     return AlunoService.get_all(session)
 
-@router.get("/{aluno_id}", response_model=AlunoRead,summary="Obter um aluno por ID")
+@router.get("/{aluno_id}", response_model=AlunoCompleto,summary="Obter um aluno por ID")
 def get_aluno_by_id(aluno_id: int, session: SessionDependency):
     return AlunoService.get_by_id(session, aluno_id)
+
+@router.post("/{aluno_id}/matricular/{turma_id}",response_model=AlunoCompleto, summary="Matricular um aluno em uma turma")
+def matricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
+    return AlunoService.inclui_aluno_na_turma(session, aluno_id, turma_id)
+
+@router.delete("/{aluno_id}/desmatricular/{turma_id}",response_model=AlunoCompleto, summary="Desmatricular um aluno de uma turma")
+def desmatricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
+    return AlunoService.remove_aluno_da_turma(session, aluno_id, turma_id)
+

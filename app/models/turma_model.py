@@ -1,8 +1,14 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:   
+
+from app.models.alunoTurmaMatriculado_model import AlunoTurmaMatriculado
+from app.models.alunoTurmaMonitor_model import AlunoTurmaMonitor
+
+
+if TYPE_CHECKING:
     from app.models.disciplina_model import Disciplina
     from app.models.professor_model import Professor
+    from app.models.aluno_model import Aluno
 
 
 class Turma(SQLModel, table=True):
@@ -14,3 +20,5 @@ class Turma(SQLModel, table=True):
     disciplina: "Disciplina" = Relationship(back_populates="turmas", passive_deletes=True)
     professor_id: int = Field(foreign_key="professor.id", nullable=False)
     professor: "Professor" = Relationship(back_populates="turmas", passive_deletes=True)
+    alunosMatriculados: list["Aluno"] = Relationship(back_populates="turmasMatriculadas", link_model=AlunoTurmaMatriculado)
+    alunosMonitores: list["Aluno"] = Relationship(back_populates="turmasMonitoradas", link_model=AlunoTurmaMonitor)
