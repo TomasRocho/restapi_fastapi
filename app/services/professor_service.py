@@ -11,7 +11,7 @@ class ProfessorService:
         except IntegrityError as exc:
             session.rollback()
             if "unique" in str(exc).lower():
-                raise HTTPException(status_code=409, detail="Professor com esse nome já existe")
+                raise HTTPException(status_code=409, detail="Professor com esse email já existe")
             raise
     
     @staticmethod
@@ -21,7 +21,7 @@ class ProfessorService:
         except IntegrityError as exc:
             session.rollback()
             if "unique" in str(exc).lower():
-                raise HTTPException(status_code=409, detail="Professor com esse nome já existe")
+                raise HTTPException(status_code=409, detail="Professor com esse email já existe")
             raise
         if not professor:
             raise HTTPException(status_code=404, detail="Professor não encontrado")

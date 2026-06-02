@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.security import create_access_token, decode_access_token, get_current_username, verify_password
 
+from app.services.professor_service import ProfessorService
 from app.services.usuario_service import UsuarioService
 from app.services.aluno_service import AlunoService
 from app.api.dep import SessionDependency
@@ -22,7 +23,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Sessi
         "is_aluno": usuario.is_aluno,
         "is_monitor": usuario.is_monitor,
         "is_professor": usuario.is_professor,   
-        "is_active": usuario.is_active 
+        "is_active": usuario.is_active,
+        "is_admin": usuario.is_admin
     }
 
     access_token = create_access_token(data=data)
@@ -49,5 +51,10 @@ def get_me(authorization: str = Header(...), session: SessionDependency = None):
             payload["aluno_email"] = aluno.email
             payload["aluno_matricula"] = aluno.matricula
             payload["aluno_curso"] = aluno.curso.nome if aluno.curso else None    
-        #todo: adicionar informações do professor no payload            
+        is_professor = payload.get("is_professor")  
+        if email is not None and is_professor:
+            professor =  ProfessorService.get_by_email(session, email)
+            payload["professor_id"] = professor.id
+            payload["professor_nome"] = professor.nome
+            payload["professor_email"] = professor.email
     return payload

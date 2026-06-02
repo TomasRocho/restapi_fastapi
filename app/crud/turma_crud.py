@@ -85,4 +85,12 @@ class TurmaCRUD:
         session.commit()
         session.refresh(turma)
         return turma
+    
+    @staticmethod
+    def remove_monitor(session: Session, aluno: Aluno, turma: Turma):
+        turma.alunosMonitores.remove(aluno)
+        session.add(turma)
+        session.commit()
+        session.refresh(turma)
+        return turma
         

@@ -12,7 +12,7 @@ class DisciplinaService:
         except IntegrityError as exc:
             session.rollback()
             if "unique" in str(exc).lower():
-                raise HTTPException(status_code=409, detail="Disciplina com esse nome já existe")
+                raise HTTPException(status_code=409, detail="Disciplina com esse nome ou código já existe")
             raise
     
     @staticmethod
@@ -22,7 +22,7 @@ class DisciplinaService:
         except IntegrityError as exc:
             session.rollback()
             if "unique" in str(exc).lower():
-                raise HTTPException(status_code=409, detail="Disciplina com esse nome já existe")
+                raise HTTPException(status_code=409, detail="Disciplina com esse nome ou código já existe")
             raise
         if not disciplina:
             raise HTTPException(status_code=404, detail="Disciplina não encontrada")
@@ -53,5 +53,5 @@ class DisciplinaService:
         return DisciplinaCRUD.get_all(session)
     
     @staticmethod
-    def get_by_parametros(session, nome=None):
-        return DisciplinaCRUD.get_by_parametros(session, nome)
+    def get_by_parametros(session, nome=None, codigo=None):
+        return DisciplinaCRUD.get_by_parametros(session, nome, codigo)

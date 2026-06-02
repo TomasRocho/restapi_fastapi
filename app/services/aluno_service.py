@@ -37,7 +37,11 @@ class AlunoService:
     def delete(session, aluno_id):
         if not AlunoCRUD.get_by_id(session, aluno_id):
             raise HTTPException(status_code=404, detail="Aluno não encontrado")
-        AlunoCRUD.delete(session, aluno_id)
+        try:
+            AlunoCRUD.delete(session, aluno_id)
+        except IntegrityError:
+            session.rollback()
+            raise HTTPException(status_code=409, detail="Aluno está matriculado em uma ou mais turmas" )
         return {"detail": "Aluno deletado com sucesso"}
 
     @staticmethod

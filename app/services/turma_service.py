@@ -91,3 +91,15 @@ class TurmaService:
         if aluno in turma.alunosMonitores:
             raise HTTPException(status_code=400, detail="Aluno já monitor dessa turma")
         return TurmaCRUD.inclui_monitor(session, aluno, turma)
+    
+    @staticmethod
+    def remove_monitor_do_aluno(session, aluno_id, turma_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = session.get(Turma, turma_id)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if aluno not in turma.alunosMonitores:
+            raise HTTPException(status_code=400, detail="Aluno não monitor dessa turma")
+        return TurmaCRUD.remove_monitor(session, aluno, turma)

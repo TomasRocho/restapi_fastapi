@@ -43,3 +43,7 @@ def desmatricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDepe
 def monitorar_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
     return TurmaService.inclui_monitor_no_aluno(session, aluno_id, turma_id)
 
+@router.delete("/{aluno_id}/desmonitorar/{turma_id}", response_model=TurmaCompleta, summary="Remover um aluno do monitoramento de uma turma")
+def desmonitorar_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
+    return TurmaService.remove_monitor_do_aluno(session, aluno_id, turma_id)
+

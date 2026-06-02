@@ -44,8 +44,10 @@ class DisciplinaCRUD:
         return session.exec(statement).all()
     
     @staticmethod
-    def get_by_parametros(session: Session, nome: Optional[str] = None):
+    def get_by_parametros(session: Session, nome: Optional[str] = None, codigo: Optional[str] = None):
         statement = select(Disciplina)
         if nome:
-            statement = statement.where(Disciplina.nome.ilike(f"%{nome}%"))  
+            statement = statement.where(Disciplina.nome.ilike(f"%{nome}%"))
+        if codigo:
+            statement = statement.where(Disciplina.codigo.ilike(f"%{codigo}%")  )
         return session.exec(statement).all()

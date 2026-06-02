@@ -8,12 +8,18 @@ from app.api.v1.routes.disciplina_route import router as disciplina_router
 from app.api.v1.routes.professor_route import router as professor_router 
 from app.api.v1.routes.turma_route import router as turma_router
 from app.core.database import create_db_and_tables  
+from app.startup import seed_initial_data
 from contextlib import asynccontextmanager
 from app.core.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
+    try:
+        seed_initial_data()
+    except Exception:
+        # don't break app startup if seeding fails
+        pass
     yield
 
 app = FastAPI(title="API", lifespan=lifespan)
