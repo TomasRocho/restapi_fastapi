@@ -27,6 +27,7 @@ class TurmaCRUD:
         turma.periodo = turma_update.periodo
         turma.disciplina_id = turma_update.disciplina_id
         turma.professor_id = turma_update.professor_id
+        turma.codigo_acesso = turma_update.codigo_acesso
         session.add(turma)
         session.commit()
         session.refresh(turma)
@@ -93,4 +94,9 @@ class TurmaCRUD:
         session.commit()
         session.refresh(turma)
         return turma
-        
+    
+    @staticmethod
+    def get_by_codigo_acesso(session, codigo_acesso):
+        return session.exec(select(Turma).where(Turma.codigo_acesso == codigo_acesso)).first()
+    
+    

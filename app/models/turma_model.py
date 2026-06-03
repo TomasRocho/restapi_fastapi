@@ -16,6 +16,7 @@ class Turma(SQLModel, table=True):
     descricao: str = Field(index=True, min_length=1, max_length=50)
     horario: str = Field(min_length=3, max_length=20)
     periodo: str = Field(index=True, min_length=6, max_length=7)
+    codigo_acesso: str = Field(min_length=6, max_length=10, unique=True)
     disciplina_id: int = Field(foreign_key="disciplina.id", nullable=False)
     disciplina: "Disciplina" = Relationship(back_populates="turmas", passive_deletes=True)
     professor_id: int = Field(foreign_key="professor.id", nullable=False)

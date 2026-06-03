@@ -14,7 +14,7 @@ class TurmaService:
         except IntegrityError as exc:
             session.rollback()
             if "unique" in str(exc).lower():
-                raise HTTPException(status_code=409, detail="Turma com essa descrição já existe")
+                raise HTTPException(status_code=409, detail="Turma com essa descrição ou código de acesso já existe")
             if "foreign key constraint" in str(exc).lower():
                 raise HTTPException(status_code=409, detail="Professor ou disciplina associada não encontrada")
             raise
@@ -26,7 +26,7 @@ class TurmaService:
         except IntegrityError as exc:
             session.rollback()
             if "unique" in str(exc).lower():
-                raise HTTPException(status_code=409, detail="Turma com essa descrição já existe")
+                raise HTTPException(status_code=409, detail="Turma com essa descrição ou código de acesso já existe")
             if "foreign key constraint" in str(exc).lower():
                 raise HTTPException(status_code=409, detail="Professor ou disciplina associada não encontrada")
             raise
@@ -103,3 +103,15 @@ class TurmaService:
         if aluno not in turma.alunosMonitores:
             raise HTTPException(status_code=400, detail="Aluno não monitor dessa turma")
         return TurmaCRUD.remove_monitor(session, aluno, turma)
+    
+    @staticmethod
+    def inclui_aluno_codigo_acesso(session, codigo_acesso, aluno_id):
+        aluno = AlunoCRUD.get_by_id(session, aluno_id)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
+        turma = TurmaCRUD.get_by_codigo_acesso(session, codigo_acesso)
+        if not turma:
+            raise HTTPException(status_code=404, detail="Turma não encontrada")
+        if aluno in turma.alunosMatriculados:
+            raise HTTPException(status_code=400, detail="Aluno já matriculado nessa turma")
+        return TurmaCRUD.inclui_aluno(session, aluno, turma)
