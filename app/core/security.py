@@ -24,6 +24,39 @@ def get_current_username(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
     
+def possui_permissao(permissoes: list[str] | str):
+    if isinstance(permissoes, str):
+        permissoes = [permissoes]
+
+    def _dependency(token: str = Depends(oauth2_scheme)):
+        credentials_exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+
+            role_checks = {
+                "PROFESSOR": payload.get("is_professor", False),
+                "ALUNO": payload.get("is_aluno", False),
+                "ADMIN": payload.get("is_admin", False),
+                "MONITOR": payload.get("is_monitor", False),
+                "QUALQUER": True
+            }
+
+            if not any(role_checks.get(perm, False) for perm in permissoes):
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Sem permissão necessária")
+
+            username: str = payload.get("sub")
+            if username is None:
+                raise credentials_exception
+            return username
+        except JWTError:
+            raise credentials_exception
+
+    return _dependency
+    
 def verify_password(plain_password, hashed_password):
     #return True
     return pwd_context.verify(plain_password, hashed_password)

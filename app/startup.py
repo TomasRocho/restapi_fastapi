@@ -80,6 +80,7 @@ def seed_initial_data():
                     descricao=f"{d.nome} - Turma A",
                     horario="Seg 14:00-16:00",
                     periodo=periods[i % len(periods)],
+                    codigo_acesso=f"ACESSO{i+1:03}",
                     disciplina_id=d.id,
                     professor_id=professores[i % len(professores)].id,
                 )

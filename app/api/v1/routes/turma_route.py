@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends
 from app.schemas.turma_schema import TurmaCreate, TurmaRead, TurmaUpdate, TurmaCompleta
 from app.services.turma_service import TurmaService
 from app.api.dep import SessionDependency
-from app.core.security import get_current_username
+from app.core.security import get_current_username, possui_permissao
 
-router = APIRouter(prefix="/turmas", tags=["Turmas"], dependencies=[Depends(get_current_username)])
+router = APIRouter(prefix="/turmas", tags=["Turmas"], dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 
 @router.post("/", response_model=TurmaRead, summary="Criar uma nova turma")
 def create_turma(turma_create: TurmaCreate, session: SessionDependency):
@@ -47,6 +47,14 @@ def monitorar_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependen
 def desmonitorar_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
     return TurmaService.remove_monitor_do_aluno(session, aluno_id, turma_id)
 
-@router.post("/codigo_acesso", response_model=TurmaCompleta, summary="Incluir aluno na turma usando código de acesso")
-def incluir_aluno_turma_codigo_acesso(codigo_acesso: str, aluno_id: int, session: SessionDependency):
-    return TurmaService.inclui_aluno_codigo_acesso(session, codigo_acesso, aluno_id)
+@router.post("/codigo_acesso_old", response_model=TurmaCompleta, 
+             summary="Incluir aluno na turma usando código de acesso",
+             dependencies=[Depends(possui_permissao(["ALUNO"]))])
+def incluir_aluno_turma_codigo_acesso_old(codigo_acesso: str, aluno_id: int, session: SessionDependency):
+    return TurmaService.inclui_aluno_codigo_acesso_old(session, codigo_acesso, aluno_id)
+
+@router.post("/codigo_acesso", response_model=TurmaCompleta, 
+             summary="Incluir aluno na turma usando código de acesso",
+             dependencies=[Depends(possui_permissao(["ALUNO"]))])
+def incluir_aluno_turma_codigo_acesso(codigo_acesso: str, session: SessionDependency, username: str = Depends(get_current_username)):
+    return TurmaService.inclui_aluno_codigo_acesso(session, codigo_acesso, username)

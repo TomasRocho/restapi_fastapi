@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends
 from app.schemas.disciplina_schema import DisciplinaCreate, DisciplinaRead, DisciplinaUpdate
 from app.services.disciplina_service import DisciplinaService
 from app.api.dep import SessionDependency
-from app.core.security import get_current_username
+from app.core.security import get_current_username, possui_permissao
 
-router = APIRouter(prefix="/disciplinas", tags=["Disciplinas"], dependencies=[Depends(get_current_username)])
+router = APIRouter(prefix="/disciplinas", tags=["Disciplinas"], dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 
 @router.post("/", response_model=DisciplinaRead,summary="Criar uma nova disciplina")
 def create_disciplina(disciplina_create: DisciplinaCreate, session: SessionDependency):

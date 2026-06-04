@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends
 from app.schemas.professor_schema import ProfessorCreate, ProfessorRead, ProfessorUpdate
 from app.services.professor_service import ProfessorService
 from app.api.dep import SessionDependency
-from app.core.security import get_current_username
+from app.core.security import get_current_username, possui_permissao
 
-router = APIRouter(prefix="/professores", tags=["Professores"], dependencies=[Depends(get_current_username)])
+router = APIRouter(prefix="/professores", tags=["Professores"], dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 
 @router.post("/", response_model=ProfessorRead, summary="Criar um novo professor")
 def create_professor(professor_create: ProfessorCreate, session: SessionDependency):

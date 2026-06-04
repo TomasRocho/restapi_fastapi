@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter, Depends, Header
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.core.security import create_access_token, decode_access_token, get_current_username, verify_password
+from app.core.security import create_access_token, decode_access_token, get_current_username, possui_permissao, verify_password
 
 from app.services.professor_service import ProfessorService
 from app.services.usuario_service import UsuarioService
@@ -30,7 +30,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Sessi
     access_token = create_access_token(data=data)
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/me", dependencies=[Depends(get_current_username)])
+@router.get("/me", dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 def get_me(authorization: str = Header(...), session: SessionDependency = None):
     token = authorization.replace("Bearer ", "")
 

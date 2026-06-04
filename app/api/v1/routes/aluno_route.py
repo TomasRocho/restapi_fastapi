@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends
 from app.schemas.aluno_schema import AlunoCreate, AlunoRead, AlunoUpdate, AlunoCompleto
 from app.services.aluno_service import AlunoService
 from app.api.dep import SessionDependency
-from app.core.security import get_current_username
+from app.core.security import possui_permissao
 
-router = APIRouter(prefix="/alunos", tags=["Alunos"], dependencies=[Depends(get_current_username)])
+router = APIRouter(prefix="/alunos", tags=["Alunos"], dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 
 @router.post("/", response_model=AlunoRead,summary="Criar um novo aluno")
 def create_aluno(aluno_create: AlunoCreate, session: SessionDependency):
