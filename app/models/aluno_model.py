@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from app.models.alunoTurmaMatriculado_model import AlunoTurmaMatriculado
 from app.models.alunoTurmaMonitor_model import AlunoTurmaMonitor
+from app.models.pergunta_model import Pergunta
 
 if TYPE_CHECKING:
     from app.models.curso_model import Curso
@@ -18,3 +19,5 @@ class Aluno(SQLModel, table=True):
     curso: "Curso" = Relationship(back_populates="alunos")
     turmasMatriculadas: list["Turma"] = Relationship(back_populates="alunosMatriculados", link_model=AlunoTurmaMatriculado)
     turmasMonitoradas: list["Turma"] = Relationship(back_populates="alunosMonitores", link_model=AlunoTurmaMonitor)
+    perguntas: list["Pergunta"] = Relationship(back_populates="aluno")
+    

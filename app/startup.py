@@ -43,18 +43,7 @@ def seed_initial_data():
             session.add_all(professors)
             session.commit()
 
-        # Usuários
-        if not session.exec(select(Usuario).limit(1)).first():
-            usuarios = []
-            profs = session.exec(select(Professor)).all()
-            for p in profs[:3]:
-                usuarios.append(Usuario(username=p.email, hashed_password=get_password_hash("password"), is_professor=True, is_aluno=False))
-            for _ in range(10):
-                email = fake.unique.email()
-                usuarios.append(Usuario(username=email, hashed_password=get_password_hash("password"), is_aluno=True))
-            usuarios.append(Usuario(username="admin@example.com", hashed_password=get_password_hash("admin123"), is_admin=True, is_aluno=False, is_professor=False))
-            session.add_all(usuarios)
-            session.commit()
+        
 
         # Alunos
         if not session.exec(select(Aluno).limit(1)).first():
@@ -67,6 +56,21 @@ def seed_initial_data():
                 curso_id = cursos[i % len(cursos)].id
                 alunos.append(Aluno(nome=name, email=email, matricula=matricula, curso_id=curso_id))
             session.add_all(alunos)
+            session.commit()
+
+        # Usuários
+        if not session.exec(select(Usuario).limit(1)).first():
+            usuarios = []
+            profs = session.exec(select(Professor)).all()
+            for p in profs[:3]:
+                usuarios.append(Usuario(username=p.email, hashed_password=get_password_hash("password"), is_professor=True, is_aluno=False))
+
+            alunos = session.exec(select(Aluno)).all()
+            for a in alunos[:3]:
+                usuarios.append(Usuario(username=a.email, hashed_password=get_password_hash("password"), is_professor=False, is_aluno=True))
+
+            usuarios.append(Usuario(username="admin@example.com", hashed_password=get_password_hash("admin123"), is_admin=True, is_aluno=False, is_professor=False))
+            session.add_all(usuarios)
             session.commit()
 
         # Turmas
