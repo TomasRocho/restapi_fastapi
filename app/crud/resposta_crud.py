@@ -3,13 +3,24 @@ from app.models.usuario_model import Usuario
 from app.schemas.resposta_schema import RespostaCreate, RespostaRead, RespostaUpdate
 from app.models.resposta_model import Resposta
 from app.models.pergunta_model import Pergunta
+from app.crud.usuario_crud import UsuarioCRUD
 from typing import Optional
 
 class RespostaCRUD:
     
     @staticmethod
-    def create(session: Session, resposta_create: RespostaCreate):
-        resposta = Resposta.model_validate(resposta_create)
+    def create(session: Session, resposta_create: RespostaCreate, username: str):
+        usuario = UsuarioCRUD.get_by_username(session, username)
+        if not usuario:
+            raise ValueError("Usuário não encontrado")
+        RespostaCreate.model_validate(resposta_create)
+
+        resposta = Resposta(
+            texto=resposta_create.texto,
+            pergunta_id=resposta_create.pergunta_id,
+            usuario_id=usuario.id,
+        )
+
         session.add(resposta)
         session.commit()
         session.refresh(resposta)

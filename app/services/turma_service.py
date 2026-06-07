@@ -108,6 +108,8 @@ class TurmaService:
     @staticmethod
     def inclui_aluno_codigo_acesso(session, codigo_acesso, username: str):
         aluno = AlunoCRUD.get_by_email(session, username)
+        if not aluno:
+            raise HTTPException(status_code=404, detail="Aluno não encontrado")
 
         turma = TurmaCRUD.get_by_codigo_acesso(session, codigo_acesso)
         if not turma:
@@ -128,3 +130,10 @@ class TurmaService:
         if aluno in turma.alunosMatriculados:
             raise HTTPException(status_code=400, detail="Aluno já matriculado nessa turma")
         return TurmaCRUD.inclui_aluno(session, aluno, turma)
+    
+    @staticmethod
+    def get_turmas_usuario(session, username):
+        try:
+            return TurmaCRUD.get_turmas_usuario(session, username)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))

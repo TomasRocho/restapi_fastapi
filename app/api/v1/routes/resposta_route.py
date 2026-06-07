@@ -9,8 +9,8 @@ from app.core.security import get_current_username, possui_permissao
 router = APIRouter(prefix="/respostas", tags=["Respostas"], dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 
 @router.post("/", response_model=RespostaRead, summary="Criar uma nova resposta")
-def create_resposta(resposta_create: RespostaCreate, session: SessionDependency):
-    return RespostaService.create(session, resposta_create)
+def create_resposta(resposta_create: RespostaCreate, session: SessionDependency,username: str = Depends(get_current_username)):
+    return RespostaService.create(session, resposta_create, username)
 
 @router.put("/{resposta_id}", response_model=RespostaRead, summary="Atualizar uma resposta existente")
 def update_resposta(resposta_id: int, resposta_update: RespostaUpdate, session: SessionDependency):

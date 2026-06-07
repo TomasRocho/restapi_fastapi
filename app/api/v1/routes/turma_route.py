@@ -19,6 +19,10 @@ def update_turma(turma_id: int, turma_update: TurmaUpdate, session: SessionDepen
 def delete_turma(turma_id: int, session: SessionDependency):
     return TurmaService.delete(session, turma_id)   
 
+@router.get("/minhas_turmas", response_model=list[TurmaRead], summary="Obter turmas do usuário logado")
+def get_turmas_usuario(session: SessionDependency, username: str = Depends(get_current_username)):
+    return TurmaService.get_turmas_usuario(session, username)
+
 @router.get("/busca", response_model=list[TurmaRead], summary="Obter turmas por parâmetros de busca")
 def get_turmas_by_parametros(session: SessionDependency, descricao: Optional[str] = None, periodo: Optional[str] = None, nome_professor: Optional[str] = None, nome_disciplina: Optional[str] = None):
     return TurmaService.get_by_parametros(session, descricao, periodo, nome_professor, nome_disciplina)
@@ -58,3 +62,4 @@ def incluir_aluno_turma_codigo_acesso_old(codigo_acesso: str, aluno_id: int, ses
              dependencies=[Depends(possui_permissao(["ALUNO"]))])
 def incluir_aluno_turma_codigo_acesso(codigo_acesso: str, session: SessionDependency, username: str = Depends(get_current_username)):
     return TurmaService.inclui_aluno_codigo_acesso(session, codigo_acesso, username)
+

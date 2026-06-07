@@ -9,7 +9,6 @@ from app.models.turma_model import Turma
 class PerguntaCreate(SQLModel):
     texto: str = Field(min_length=5, max_length=500)
     turma_id: int = Field(foreign_key="turma.id", nullable=False,index=True,ondelete="RESTRICT")
-    aluno_id: int = Field(foreign_key="aluno.id", nullable=False,index=True,ondelete="RESTRICT")
     is_restrita_professor: bool = Field(default=False)
     is_restrita_monitor: bool = Field(default=False)
 

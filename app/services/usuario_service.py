@@ -42,6 +42,8 @@ class UsuarioService:
     
     @staticmethod
     def update_usuario(session, usuario_id, usuario_update):
+        if usuario_update.is_aluno and usuario_update.is_professor:
+            raise HTTPException(status_code=400, detail="Um usuário não pode ser aluno e professor ao mesmo tempo.")
         usuario = UsuarioCRUD.update_usuario(session, usuario_id, usuario_update)
         if not usuario:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")

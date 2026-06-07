@@ -5,9 +5,9 @@ from sqlalchemy.exc import IntegrityError
 class RespostaService:
     
     @staticmethod
-    def create(session, resposta_create):
+    def create(session, resposta_create,username):
         try:
-            return RespostaCRUD.create(session, resposta_create)
+            return RespostaCRUD.create(session, resposta_create, username)
         except IntegrityError as exc:
             session.rollback()
             if "foreign key constraint" in str(exc).lower():

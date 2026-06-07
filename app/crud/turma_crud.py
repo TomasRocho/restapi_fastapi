@@ -1,9 +1,12 @@
+from certifi import where
 from sqlmodel import Session, select
 from app.models.aluno_model import Aluno
 from app.models.turma_model import Turma
 from app.schemas.turma_schema import TurmaCreate, TurmaRead, TurmaUpdate
 from app.models.professor_model import Professor
 from app.models.disciplina_model import Disciplina
+from app.crud.usuario_crud import UsuarioCRUD
+from app.models.usuario_model import Usuario
 from typing import Optional
 
 class TurmaCRUD:
@@ -96,7 +99,20 @@ class TurmaCRUD:
         return turma
     
     @staticmethod
-    def get_by_codigo_acesso(session, codigo_acesso):
+    def get_by_codigo_acesso(session: Session, codigo_acesso: str):
         return session.exec(select(Turma).where(Turma.codigo_acesso == codigo_acesso)).first()
+    
+    @staticmethod
+    def get_turmas_usuario(session: Session, username: str):
+        usuario: Usuario = UsuarioCRUD.get_by_username(session, username)
+        if not usuario:
+            raise ValueError("Usuário não encontrado")
+        if not usuario.is_aluno and not usuario.is_professor:
+            raise ValueError("Usuário deve ser aluno ou professor")
+        if usuario.is_professor:
+            statement = select(Turma).join(Professor).where(Professor.email == usuario.username)
+        if usuario.is_aluno:
+            statement = select(Turma).join(Turma.alunosMatriculados).where(Aluno.email == usuario.username)    
+        return session.exec(statement).all()
     
     
