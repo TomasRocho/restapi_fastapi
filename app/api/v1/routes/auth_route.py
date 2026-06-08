@@ -21,7 +21,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Sessi
         "sub": usuario.username,
         "id": usuario.id,
         "is_aluno": usuario.is_aluno,
-        "is_monitor": usuario.is_monitor,
         "is_professor": usuario.is_professor,   
         "is_active": usuario.is_active,
         "is_admin": usuario.is_admin

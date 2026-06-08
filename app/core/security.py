@@ -41,7 +41,6 @@ def possui_permissao(permissoes: list[str] | str):
                 "PROFESSOR": payload.get("is_professor", False),
                 "ALUNO": payload.get("is_aluno", False),
                 "ADMIN": payload.get("is_admin", False),
-                "MONITOR": payload.get("is_monitor", False),
                 "QUALQUER": True
             }
 

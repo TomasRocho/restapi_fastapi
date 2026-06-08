@@ -15,7 +15,7 @@ def create_aluno(aluno_create: AlunoCreate, session: SessionDependency):
 def update_aluno(aluno_id: int, aluno_update: AlunoUpdate, session: SessionDependency):
     return AlunoService.update(session, aluno_id, aluno_update)
 
-@router.delete("/{aluno_id}", summary="Deletar um aluno")
+@router.delete("/{aluno_id}", summary="Deletar um aluno", dependencies=[Depends(possui_permissao(["ADMIN"]))])
 def delete_aluno(aluno_id: int, session: SessionDependency):
     return AlunoService.delete(session, aluno_id)
 
@@ -31,11 +31,11 @@ def get_all_alunos(session: SessionDependency):
 def get_aluno_by_id(aluno_id: int, session: SessionDependency):
     return AlunoService.get_by_id(session, aluno_id)
 
-@router.post("/{aluno_id}/matricular/{turma_id}",response_model=AlunoCompleto, summary="Matricular um aluno em uma turma")
+@router.post("/{aluno_id}/matricular/{turma_id}",response_model=AlunoCompleto, summary="Matricular um aluno em uma turma", dependencies=[Depends(possui_permissao(["ADMIN", "PROFESSOR"]))])
 def matricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
     return AlunoService.inclui_aluno_na_turma(session, aluno_id, turma_id)
 
-@router.delete("/{aluno_id}/desmatricular/{turma_id}",response_model=AlunoCompleto, summary="Desmatricular um aluno de uma turma")
+@router.delete("/{aluno_id}/desmatricular/{turma_id}",response_model=AlunoCompleto, summary="Desmatricular um aluno de uma turma", dependencies=[Depends(possui_permissao(["ADMIN", "PROFESSOR"]))])
 def desmatricular_aluno_turma(aluno_id: int, turma_id: int, session: SessionDependency):
     return AlunoService.remove_aluno_da_turma(session, aluno_id, turma_id)
 

@@ -137,3 +137,17 @@ class TurmaService:
             return TurmaCRUD.get_turmas_usuario(session, username)
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc))
+        
+    @staticmethod
+    def is_usuario_monitor(session, username, turma_id):
+        try:
+            return TurmaCRUD.is_usuario_monitor(session, username, turma_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))   
+        
+    @staticmethod
+    def is_usuario_matriculado(session, username, turma_id):
+        try:
+            return TurmaCRUD.is_usuario_matriculado(session, username, turma_id)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=str(exc))

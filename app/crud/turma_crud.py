@@ -111,8 +111,36 @@ class TurmaCRUD:
             raise ValueError("Usuário deve ser aluno ou professor")
         if usuario.is_professor:
             statement = select(Turma).join(Professor).where(Professor.email == usuario.username)
+            return session.exec(statement).all()
         if usuario.is_aluno:
-            statement = select(Turma).join(Turma.alunosMatriculados).where(Aluno.email == usuario.username)    
-        return session.exec(statement).all()
+            statement_matriculado = select(Turma).join(Turma.alunosMatriculados).where(Aluno.email == usuario.username)
+            statement_monitor = select(Turma).join(Turma.alunosMonitores).where(Aluno.email == usuario.username)
+            turmas_matriculadas = session.exec(statement_matriculado).all()
+            turmas_monitoradas = session.exec(statement_monitor).all()
+            return list(set(turmas_matriculadas + turmas_monitoradas))
+        
+    @staticmethod
+    def is_usuario_monitor(session: Session, username: str, turma_id: int):
+        usuario: Usuario = UsuarioCRUD.get_by_username(session, username)
+        if not usuario:
+            raise ValueError("Usuário não encontrado")
+        if not usuario.is_aluno:
+            raise ValueError("Usuário deve ser aluno para ser monitor")
+        statement = select(Turma).join(Turma.alunosMonitores).where(Aluno.email == usuario.username, Turma.id == turma_id)
+        if session.exec(statement).first() is not None:
+            return True
+        return False
+    
+    @staticmethod
+    def is_usuario_matriculado(session: Session, username: str, turma_id: int):
+        usuario: Usuario = UsuarioCRUD.get_by_username(session, username)
+        if not usuario:
+            raise ValueError("Usuário não encontrado")
+        if not usuario.is_aluno:
+            raise ValueError("Usuário deve ser aluno para ser matriculado")
+        statement = select(Turma).join(Turma.alunosMatriculados).where(Aluno.email == usuario.username, Turma.id == turma_id)
+        if session.exec(statement).first() is not None:
+            return True
+        return False
     
     

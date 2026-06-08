@@ -1,5 +1,5 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from app.schemas.turma_schema import TurmaCreate, TurmaRead, TurmaUpdate, TurmaCompleta
 from app.services.turma_service import TurmaService
 from app.api.dep import SessionDependency
@@ -7,15 +7,15 @@ from app.core.security import get_current_username, possui_permissao
 
 router = APIRouter(prefix="/turmas", tags=["Turmas"], dependencies=[Depends(possui_permissao(["QUALQUER"]))])
 
-@router.post("/", response_model=TurmaRead, summary="Criar uma nova turma")
+@router.post("/", response_model=TurmaRead, summary="Criar uma nova turma", dependencies=[Depends(possui_permissao(["ADMIN", "PROFESSOR"]))])
 def create_turma(turma_create: TurmaCreate, session: SessionDependency):
     return TurmaService.create(session, turma_create)
 
-@router.put("/{turma_id}", response_model=TurmaRead, summary="Atualizar uma turma existente")
+@router.put("/{turma_id}", response_model=TurmaRead, summary="Atualizar uma turma existente", dependencies=[Depends(possui_permissao(["ADMIN", "PROFESSOR"]))])
 def update_turma(turma_id: int, turma_update: TurmaUpdate, session: SessionDependency):
     return TurmaService.update(session, turma_id, turma_update)
 
-@router.delete("/{turma_id}", summary="Deletar uma turma")
+@router.delete("/{turma_id}", summary="Deletar uma turma", dependencies=[Depends(possui_permissao(["ADMIN", "PROFESSOR"]))])
 def delete_turma(turma_id: int, session: SessionDependency):
     return TurmaService.delete(session, turma_id)   
 
@@ -63,3 +63,11 @@ def incluir_aluno_turma_codigo_acesso_old(codigo_acesso: str, aluno_id: int, ses
 def incluir_aluno_turma_codigo_acesso(codigo_acesso: str, session: SessionDependency, username: str = Depends(get_current_username)):
     return TurmaService.inclui_aluno_codigo_acesso(session, codigo_acesso, username)
 
+
+@router.get("/is_monitor/{turma_id}", response_model=bool, summary="Verificar se um aluno é monitor de uma turma")
+def is_usuario_monitor(session: SessionDependency, username: str = Depends(get_current_username), turma_id: int = Path(...)):
+    return TurmaService.is_usuario_monitor(session, username, turma_id)
+
+@router.get("/is_matriculado/{turma_id}", response_model=bool, summary="Verificar se um aluno está matriculado em uma turma")
+def is_usuario_matriculado(session: SessionDependency, username: str = Depends(get_current_username), turma_id: int = Path(...)):
+    return TurmaService.is_usuario_matriculado(session, username, turma_id)
